@@ -1,7 +1,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
 
-const myFont = localFont({
+// সোলাইমানলিপি ফন্ট সেটআপ (Multiple weights সহ)
+const solaimanFont = localFont({
   src: [
     {
       path:'../../public/local fonts/SolaimanLipi/SolaimanLipi-Thin.ttf',
@@ -17,9 +18,26 @@ const myFont = localFont({
       path:'../../public/local fonts/SolaimanLipi/SolaimanLipi-Bold.ttf',
       weight: '700',
       style: 'bold',
-    }
-  ]
+    },
+  ],
+  variable: '--font-solaiman',
+  display: 'swap',
+});
+
+// নিকশ ফন্ট সেটআপ
+const nikoshFont = localFont({
+  src: [
+    {
+      path: '../../public/local fonts/Nikosh/Nikosh.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-nikosh',
+  display: 'swap',
 })
+
+export { nikoshFont, solaimanFont };
 
 
 export const metadata = {
@@ -29,8 +47,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={myFont.className}>
-      <body>
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
+      <body className={solaimanFont.className}>
         {children}
       </body>
     </html>
