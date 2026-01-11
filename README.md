@@ -29,6 +29,7 @@ export default function RootLayout({ children }) {
   )
 }
 ```
+![Public folder](/Img/local-fonts.png)
 
 ### 2. **কাস্টম ফন্ট (Local Fonts)**
 ```javascript
@@ -144,6 +145,17 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
+ // চাইলে bodyর মধ্যে আমরা দিতে পারি
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
+      <body className={`${nikoshFont.className} text-sm`}>
+        {children}
+      </body>
+    </html>
+  );
+}
 ```
 
 ### **পেজে ফন্ট ব্যবহার:**
@@ -154,7 +166,7 @@ import { nikoshFont } from "./layout";
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <h1>সোলাইমানলিপি বাংলা ফন্ট</h1>
+      <h1 className='text-lg'>সোলাইমানলিপি বাংলা ফন্ট</h1>
       <h1 className={`${nikoshFont.className} text-sm`}>নিকশ বাংলা ফন্ট</h1>
     </div>
   );
@@ -466,4 +478,130 @@ export const getFont = (fontName) => {
 
 ---
 
-**মনে রাখুন:** ফন্ট অপ্টিমাইজেশন শুধু কোডের বিষয় নয়, UX-এরও বিষয়। সঠিক ফন্ট লোডিং কৌশল আপনার ওয়েবসাইটের পারফরম্যান্স এবং ব্যবহারকারীর অভিজ্ঞতা উন্নত করতে পারে।
+## 🧠 `<html>` vs `<body>` এ `className` ব্যবহারের পার্থক্য
+
+Next.js (বিশেষ করে `app/layout.js`)–এ ফন্ট বা থিম ব্যবস্থাপনার সময় `<html>` এবং `<body>`–তে class দেওয়ার প্রভাব আলাদা। সঠিক জায়গায় সঠিক class ব্যবহার করা খুব গুরুত্বপূর্ণ।
+
+---
+
+### 1️⃣ `<html>` এ class দিলে কী হয়
+
+```jsx
+<html className="font-solaiman font-nikosh">
+```
+
+### ✅ প্রভাব
+
+* পুরো **ডকুমেন্ট লেভেলে** কাজ করে
+* DOM hierarchy অনুযায়ী
+  `html → body → সব elements`
+  এই class–এর ভিতরে পড়ে
+* সরাসরি টেক্সটে ফন্ট apply করে না
+* সাধারণত **CSS variables ও global state বহন** করে
+
+### ✅ কখন ব্যবহার করবেন
+
+* একাধিক font variable define করতে হলে
+* Global font system তৈরি করতে
+* Dark / Light mode toggle করতে
+* Global CSS variables দরকার হলে
+* Theme বা design token রাখার জন্য
+
+### 📌 উদাহরণ
+
+```css
+/* globals.css */
+.font-solaiman {
+  --font-solaiman: 'SolaimanLipi';
+}
+
+.font-nikosh {
+  --font-nikosh: 'Nikosh';
+}
+
+body {
+  font-family: var(--font-solaiman);
+}
+```
+
+🔎 **ব্যাখ্যা:**
+এখানে `<html>` শুধু variable বহন করছে।
+ফন্ট সরাসরি text–এ apply হচ্ছে না, বরং `body` সেই variable ব্যবহার করছে।
+
+👉 **Best practice:**
+`<html>` = variable / configuration holder
+
+---
+
+### 2️⃣ `<body>` তে class দিলে কী হয়
+
+```jsx
+<body className={solaimanFont.className}>
+```
+
+### ✅ প্রভাব
+
+* মূল কনটেন্টের উপর **সরাসরি apply হয়**
+* সব text, paragraph, heading, button, link—সব জায়গায় ফন্ট কাজ করে
+* Default font হিসেবে সেট হয়
+
+### ✅ কখন ব্যবহার করবেন
+
+* Default / primary font set করতে চাইলে
+* Layout, spacing, background, text color সেট করতে
+* App–wide typography control করতে
+
+### 📌 উদাহরণ
+
+```css
+body {
+  font-family: 'SolaimanLipi';
+}
+```
+
+👉 এই ক্ষেত্রে আলাদা করে variable দরকার নেই
+👉 ফন্ট সরাসরি DOM–এ apply হচ্ছে
+
+---
+
+### 🟢 Recommended Pattern (Best Practice)
+
+```jsx
+<html lang="bn" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
+  <body className={solaimanFont.className}>
+    {children}
+  </body>
+</html>
+```
+
+### কেন এই প্যাটার্ন সেরা?
+
+| Element   | দায়িত্ব                              |
+| --------- | ------------------------------------ |
+| `<html>`  | Font variables, theme, global config |
+| `<body>`  | Primary / default font apply         |
+| Component | Secondary font selectively apply     |
+
+---
+
+### ❌ ভুল পদ্ধতি (Avoid This)
+
+```jsx
+<body className={`${solaimanFont.className} ${nikoshFont.className}`}>
+```
+
+🚫 এতে:
+
+* একাধিক font একসাথে apply হয়
+* CSS conflict হয়
+* Performance ও maintainability খারাপ হয়
+
+---
+
+### 🧠 মনে রাখবেন
+
+* `<html>` → **configuration layer**
+* `<body>` → **presentation layer**
+* Font system clean রাখতে হলে এই separation খুব জরুরি
+
+---

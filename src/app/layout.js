@@ -48,7 +48,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
-      <body className={solaimanFont.className}>
+      <body className={`${nikoshFont.className} text-sm`}>
         {children}
       </body>
     </html>
