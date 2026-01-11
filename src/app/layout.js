@@ -1,5 +1,19 @@
 import localFont from "next/font/local";
+import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
+
+
+const interFont = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const robotoFont = Roboto({
+  subsets: ['latin'],
+  variable: '--font-roboto',
+  display: 'swap',
+})
 
 // সোলাইমানলিপি ফন্ট সেটআপ (Multiple weights সহ)
 const solaimanFont = localFont({
@@ -37,7 +51,7 @@ const nikoshFont = localFont({
   display: 'swap',
 })
 
-export { nikoshFont, solaimanFont };
+export { nikoshFont, solaimanFont, interFont, robotoFont };
 
 
 export const metadata = {
@@ -47,8 +61,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
-      <body className={`${nikoshFont.className} text-sm`}>
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable} ${interFont.variable} ${robotoFont.variable}`}>
+      <body className={interFont.className}>
         {children}
       </body>
     </html>

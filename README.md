@@ -88,9 +88,23 @@ export default function RootLayout({ children }) {
 ### 3. **একাধিক ফন্ট একসাথে ব্যবহার (Multiple Fonts)**
 ```javascript
 import localFont from "next/font/local";
+import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 
-// সোলাইমানলিপি ফন্ট সেটআপ (Multiple weights সহ)
+// Google Fonts
+const interFont = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const robotoFont = Roboto({
+  subsets: ['latin'],
+  variable: '--font-roboto',
+  display: 'swap',
+})
+
+// বাংলা লোডাল ফন্টস
 const solaimanFont = localFont({
   src: [
     {
@@ -113,7 +127,6 @@ const solaimanFont = localFont({
   display: 'swap',
 });
 
-// নিকশ ফন্ট সেটআপ
 const nikoshFont = localFont({
   src: [
     {
@@ -127,7 +140,7 @@ const nikoshFont = localFont({
 })
 
 // ফন্ট এক্সপোর্ট করুন
-export { nikoshFont, solaimanFont };
+export { nikoshFont, solaimanFont, interFont, robotoFont };
 
 export const metadata = {
   title: "Next.js Font Optimization",
@@ -136,21 +149,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    // একাধিক ফন্ট variable একসাথে ব্যবহার
-    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
-      {/* মূল ফন্ট body তে অ্যাপ্লাই করুন */}
-      <body className={solaimanFont.className}>
-        {children}
-      </body>
-    </html>
-  );
-}
-
- // চাইলে bodyর মধ্যে আমরা দিতে পারি
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
-      <body className={`${nikoshFont.className} text-sm`}>
+    // সব ফন্ট variable একসাথে html তে
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable} ${interFont.variable} ${robotoFont.variable}`}>
+      <body>
         {children}
       </body>
     </html>
@@ -161,33 +162,46 @@ export default function RootLayout({ children }) {
 ### **পেজে ফন্ট ব্যবহার:**
 ```javascript
 // app/page.js
-import { nikoshFont } from "./layout";
+import { nikoshFont, solaimanFont, interFont, robotoFont } from "./layout";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <h1 className='text-lg'>সোলাইমানলিপি বাংলা ফন্ট</h1>
+      <h1 className={`${solaimanFont.className} text-lg`}>সোলাইমানলিপি বাংলা ফন্ট</h1>
       <h1 className={`${nikoshFont.className} text-sm`}>নিকশ বাংলা ফন্ট</h1>
+      <h1 className={`${robotoFont.className} text-md font-bold`}>Roboto english font for heading</h1>
+      <h1 className={`${interFont.className} text-md font-light`}>Inter Font for articles</h1>
     </div>
   );
 }
 ```
+![Output view](/public/Img/output-view.png)
 
 ### **CSS Variables ব্যবহার করে ফন্ট পরিবর্তন:**
 ```css
 /* globals.css */
 :root {
-  --font-primary: 'SolaimanLipi', sans-serif;
-  --font-secondary: 'Nikosh', sans-serif;
+  --font-solaiman: 'SolaimanLipi', sans-serif;
+  --font-nikosh: 'Nikosh', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
 }
 
 /* ব্যবহার */
-.primary-text {
+.solaiman-text {
   font-family: var(--font-solaiman);
 }
 
-.secondary-text {
+.nikosh-text {
   font-family: var(--font-nikosh);
+}
+
+.inter-text {
+  font-family: var(--font-inter);
+}
+
+.roboto-text {
+  font-family: var(--font-roboto);
 }
 ```
 
@@ -213,16 +227,16 @@ const font = GoogleFont({
 3. **`display: 'swap'`:** FOIT/FOUT সমস্যা সমাধান
 4. **Variable Fonts:** একাধিক ওজন ম্যানেজ করা সহজ
 5. **Font Loading Strategy:** কৌশলগতভাবে লোডিং ম্যানেজ করুন
-6. **একাধিক ফন্ট ব্যবস্থাপনা:** Primary ফন্ট body তে, Secondary ফন্ট variable হিসেবে
+6. **একাধিক ফন্ট ব্যবস্থাপনা:** Variables html-এ, প্রয়োজনে পেজে className
 
 ### **একাধিক ফন্ট ব্যবস্থাপনা নীতিমালা:**
 
 ```javascript
-// ✅ সঠিক পদ্ধতি: Primary font body তে, secondary fonts variables হিসেবে
+// ✅ সঠিক পদ্ধতি: সব font variables html-এ
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${primaryFont.variable} ${secondaryFont.variable}`}>
-      <body className={primaryFont.className}>
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable} ${interFont.variable}`}>
+      <body>
         {children}
       </body>
     </html>
@@ -230,7 +244,7 @@ export default function RootLayout({ children }) {
 }
 
 // ❌ ভুল পদ্ধতি: সব ফন্ট body তে
-<body className={`${font1.className} ${font2.className}`}>
+<body className={`${solaimanFont.className} ${nikoshFont.className} ${interFont.className}`}>
 ```
 
 ### **ফাইল ফরম্যাট প্রায়োরিটি:**
@@ -294,11 +308,11 @@ const customFont = localFont({
 export default function Layout({ children }) {
   return (
     <html lang="en" className={customFont.variable}>
-      <body className={customFont.className}>
+      <body>
         {/* বিভিন্ন weight ব্যবহার */}
-        <h1 className="font-bold">Bold Text</h1>
-        <p className="font-normal">Regular Text</p>
-        <p className="font-light italic">Light Italic Text</p>
+        <h1 className={`${customFont.className} font-bold`}>Bold Text</h1>
+        <p className={`${customFont.className} font-normal`}>Regular Text</p>
+        <p className={`${customFont.className} font-light italic`}>Light Italic Text</p>
       </body>
     </html>
   )
@@ -347,7 +361,7 @@ module.exports = {
 2. **লেআউট শিফট:** `font-size-adjust` প্রোপার্টি ব্যবহার করুন
 3. **ধীর লোডিং:** CDN ব্যবহার করুন এবং ফন্ট সাবসেটিং করুন
 4. **একাধিক ফন্ট ফাইল লোড:** শুধুমাত্র প্রয়োজনীয় weights প্রিলোড করুন
-5. **একাধিক ফন্ট কনফ্লিক্ট:** Primary font body তে, secondary fonts variables হিসেবে রাখুন
+5. **একাধিক ফন্ট কনফ্লিক্ট:** Font variables html-এ রাখুন, প্রয়োজনমত পেজে className ব্যবহার করুন
 
 ### **একাধিক ফন্ট ব্যবস্থাপনা টিপস:**
 ```javascript
@@ -417,8 +431,8 @@ const nikoshFont = localFont({
 export default function Layout({ children }) {
   return (
     <html lang="bn" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
-      <body className={solaimanFont.className}>
-        {/* প্রাইমারি ফন্ট হিসেবে সোলাইমানলিপি */}
+      <body>
+        {/* প্রয়োজনমত পেজে ফন্ট ব্যবহার করুন */}
         {children}
       </body>
     </html>
@@ -435,7 +449,7 @@ export default function Layout({ children }) {
 5. **Use CSS Font Display API:** বেটার কন্ট্রোলের জন্য
 6. **Monitor Performance:** Web Vitals ব্যবহার করে মনিটর করুন
 7. **Implement Fallback Fonts:** ফন্ট লোড না হলে alternative
-8. **Multiple Font Strategy:** Primary ফন্ট body তে, Secondary ফন্ট variable হিসেবে
+8. **Multiple Font Strategy:** সব font variables html-এ রাখুন
 9. **Font Export:** ফন্টগুলো export করুন যাতে অন্য পেজে ব্যবহার করা যায়
 10. **Variable Management:** CSS variables দিয়ে ফন্ট পরিবর্তন করুন
 
@@ -454,6 +468,14 @@ export const fonts = {
     className: nikoshFont.className,
     variable: nikoshFont.variable,
   },
+  inter: {
+    className: interFont.className,
+    variable: interFont.variable,
+  },
+  roboto: {
+    className: robotoFont.className,
+    variable: robotoFont.variable,
+  },
 };
 
 // Conditional font loading
@@ -463,8 +485,12 @@ export const getFont = (fontName) => {
       return solaimanFont.className;
     case 'nikosh':
       return nikoshFont.className;
+    case 'inter':
+      return interFont.className;
+    case 'roboto':
+      return robotoFont.className;
     default:
-      return solaimanFont.className;
+      return interFont.className;
   }
 };
 ```
@@ -487,7 +513,7 @@ Next.js (বিশেষ করে `app/layout.js`)–এ ফন্ট বা �
 ### 1️⃣ `<html>` এ class দিলে কী হয়
 
 ```jsx
-<html className="font-solaiman font-nikosh">
+<html className="font-solaiman font-nikosh font-inter font-roboto">
 ```
 
 ### ✅ প্রভাব
@@ -519,14 +545,18 @@ Next.js (বিশেষ করে `app/layout.js`)–এ ফন্ট বা �
   --font-nikosh: 'Nikosh';
 }
 
-body {
-  font-family: var(--font-solaiman);
+.font-inter {
+  --font-inter: 'Inter';
+}
+
+.font-roboto {
+  --font-roboto: 'Roboto';
 }
 ```
 
 🔎 **ব্যাখ্যা:**
 এখানে `<html>` শুধু variable বহন করছে।
-ফন্ট সরাসরি text–এ apply হচ্ছে না, বরং `body` সেই variable ব্যবহার করছে।
+ফন্ট সরাসরি text–এ apply হচ্ছে না, বরং পেজে সেই variable ব্যবহার করছে।
 
 👉 **Best practice:**
 `<html>` = variable / configuration holder
@@ -542,8 +572,8 @@ body {
 ### ✅ প্রভাব
 
 * মূল কনটেন্টের উপর **সরাসরি apply হয়**
-* সব text, paragraph, heading, button, link—সব জায়গায় ফন্ট কাজ করে
-* Default font হিসেবে সেট হয়
+* সব text, paragraph, heading, button, link—সব জায়গায় ফন্ট কাজ করে
+* Default font হিসেবে সেট হয়
 
 ### ✅ কখন ব্যবহার করবেন
 
@@ -567,41 +597,109 @@ body {
 ### 🟢 Recommended Pattern (Best Practice)
 
 ```jsx
-<html lang="bn" className={`${solaimanFont.variable} ${nikoshFont.variable}`}>
-  <body className={solaimanFont.className}>
+// app/layout.js
+<html lang="bn" className={`${solaimanFont.variable} ${nikoshFont.variable} ${interFont.variable} ${robotoFont.variable}`}>
+  <body>
     {children}
   </body>
 </html>
+
+// app/page.js
+<h1 className={`${solaimanFont.className} text-lg`}>সোলাইমানলিপি বাংলা ফন্ট</h1>
+<h1 className={`${nikoshFont.className} text-sm`}>নিকশ বাংলা ফন্ট</h1>
 ```
 
 ### কেন এই প্যাটার্ন সেরা?
 
-| Element   | দায়িত্ব                              |
+| Element   | দায়িত্ব                              |
 | --------- | ------------------------------------ |
 | `<html>`  | Font variables, theme, global config |
-| `<body>`  | Primary / default font apply         |
-| Component | Secondary font selectively apply     |
+| `<body>`  | Default structure (font-free)        |
+| Component | প্রয়োজনমত selective font apply     |
 
 ---
 
 ### ❌ ভুল পদ্ধতি (Avoid This)
 
 ```jsx
-<body className={`${solaimanFont.className} ${nikoshFont.className}`}>
+<body className={`${solaimanFont.className} ${nikoshFont.className} ${interFont.className}`}>
 ```
 
 🚫 এতে:
 
-* একাধিক font একসাথে apply হয়
-* CSS conflict হয়
-* Performance ও maintainability খারাপ হয়
+* একাধিক font একসাথে apply হয়
+* CSS conflict হয়
+* Performance ও maintainability খারাপ হয়
 
 ---
 
 ### 🧠 মনে রাখবেন
 
 * `<html>` → **configuration layer**
-* `<body>` → **presentation layer**
+* `<body>` → **structure layer** (font-free)
+* **Components** → **presentation layer** (font applied selectively)
 * Font system clean রাখতে হলে এই separation খুব জরুরি
 
 ---
+
+## 📝 আপনার প্রজেক্টের জন্য নির্দেশনা
+
+আপনার প্রদত্ত কোড অনুযায়ী:
+
+### ✅ সঠিক পদ্ধতি (যেমনটা আপনি করেছেন):
+```javascript
+// layout.js
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable} ${interFont.variable} ${robotoFont.variable}`}>
+      <body>
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+```javascript
+// page.js
+export default function Home() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+      <h1 className={`${solaimanFont.className} text-lg`}>সোলাইমানলিপি বাংলা ফন্ট</h1>
+      <h1 className={`${nikoshFont.className} text-sm`}>নিকশ বাংলা ফন্ট</h1>
+      <h1 className={`${robotoFont.className} text-md font-bold`}>Roboto english font for heading</h1>
+      <h1 className={`${interFont.className} text-md font-light`}>Inter Font for articles</h1>
+    </div>
+  );
+}
+```
+
+### 🔧 আরও উন্নত পদ্ধতি (যদি চান):
+```javascript
+// layout.js - যদি একটি primary font থাকে
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={`${solaimanFont.variable} ${nikoshFont.variable} ${interFont.variable} ${robotoFont.variable}`}>
+      <body className={interFont.className}> {/* Default font Inter */}
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+```javascript
+// page.js - বাংলা ফন্ট প্রয়োগ
+<h1 className={`${solaimanFont.className} text-lg`}>বাংলা হেডিং</h1>
+<p className="text-gray-600">ইংরেজি কনটেন্ট (Inter font automatically from body)</p>
+```
+
+---
+
+## 🎯 সারসংক্ষেপ
+
+1. **Font variables সবসময় `<html>` এ রাখুন**
+2. **Default font প্রয়োগ করতে চাইলে `<body>` এ className দিন**
+3. **বিশেষ ফন্ট প্রয়োগ করতে চাইলে পেজ/কম্পোনেন্টে className দিন**
+4. **Font export করুন যাতে সব পেজে ব্যবহার করতে পারেন**
+5. **Performance: শুধুমাত্র প্রয়োজনীয় ফন্ট প্রিলোড করুন**
