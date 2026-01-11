@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
   )
 }
 ```
-![Public folder](/Img/local-fonts.png)
+![Public folder](/public/Img/local-fonts.png)
 
 ### 2. **কাস্টম ফন্ট (Local Fonts)**
 ```javascript
